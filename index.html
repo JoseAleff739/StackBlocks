@@ -2,11 +2,13 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>StackBlocks</title> <!-- Nome do jogo -->
+  <title>StackBlocks</title>
 
   <style>
+    /* Importa a fonte Press Start 2P do Google Fonts para dar estilo retro ao jogo */
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+    /* Reset básico de CSS para garantir consistência entre navegadores */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -14,6 +16,7 @@
       font-family: 'Press Start 2P', monospace;
     }
 
+    /* Estilização do corpo da página */
     body {
       background-color: #000;
       display: flex;
@@ -23,10 +26,11 @@
       color: #fff;
     }
 
+    /* Container principal do jogo com layout em grid */
     .game-container {
       background-color: rgba(0, 0, 0, 0.75);
       display: grid;
-      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-columns: 1fr 2fr 1fr; /* Sidebar esquerda, canvas central, sidebar direita */
       grid-template-rows: auto auto;
       gap: 20px;
       padding: 20px;
@@ -35,6 +39,7 @@
       width: 90vw;
     }
 
+    /* Estilização das barras laterais (score e próxima peça) */
     .sidebar, .next-container {
       display: flex;
       flex-direction: column;
@@ -48,6 +53,7 @@
       border-radius: 5px;
     }
 
+    /* Estilização dos elementos dentro das sidebars */
     .sidebar div, .next-container canvas {
       background-color: #222;
       padding: 10px;
@@ -56,14 +62,16 @@
       border-radius: 3px;
     }
 
+    /* Canvas principal onde o jogo acontece */
     canvas#tetris {
       background-color: #000;
       border: 4px solid #fff;
       border-radius: 5px;
     }
 
+    /* Container dos botões de controle */
     .controls {
-      grid-column: span 3;
+      grid-column: span 3; /* Ocupa todas as 3 colunas */
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
@@ -71,6 +79,7 @@
       margin-top: 20px;
     }
 
+    /* Estilização padrão dos botões */
     button {
       padding: 12px 20px;
       font-size: 14px;
@@ -83,15 +92,18 @@
       user-select: none;
     }
 
+    /* Efeito hover nos botões */
     button:hover {
       background-color: #fff;
       color: #000;
     }
 
+    /* Cores específicas para botões importantes */
     button#start { border-color: #00ff00; }
     button#restart { border-color: orange; }
     button#pause { border-color: red; }
 
+    /* Tela de Game Over */
     #gameOverScreen {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -109,15 +121,17 @@
 
     #gameOverScreen p { margin-bottom: 20px; }
 
-    /* MENU DE AUDIO SUSPENSO */
-    .audio-dropdown {
+    /* Menu dropdown de configurações */
+    .menu-dropdown {
       position: fixed;
       top: 10px;
       right: 10px;
       z-index: 1000;
+      display: flex;
+      gap: 10px;
     }
 
-    .audio-dropdown button {
+    .menu-dropdown button {
       border: 2px solid #555;
       background-color: #222;
       color: #ccc;
@@ -126,73 +140,427 @@
       cursor: pointer;
     }
 
-    .audio-dropdown-content {
+    /* Conteúdo do dropdown */
+    .dropdown-content {
       display: none;
       position: absolute;
       right: 0;
-      top: 30px;
-      background-color: rgba(17,17,17,0.95);
+      top: 40px;
+      background-color: rgba(17,17,17,0.98);
       border: 2px solid #555;
       border-radius: 8px;
-      padding: 10px;
-      width: 150px;
+      padding: 15px;
+      min-width: 250px;
       font-size: 12px;
       color: #ccc;
+      max-height: 400px;
+      overflow-y: auto;
     }
 
-    .audio-dropdown-content button {
+    .dropdown-content button {
       width: 100%;
       margin: 4px 0;
       font-size: 12px;
       padding: 4px 0;
     }
 
-    .audio-dropdown-content input[type=range] {
+    .dropdown-content input[type=range] {
       width: 100%;
     }
 
-    /* POP-UP INSTRUÇÕES */
+    /* Popup de instruções/tutorial */
     #instructionsPopup {
-      position: absolute;
+      position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(0,0,0,0.95);
+      background: linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,0,40,0.95) 100%);
       color: #fff;
       font-family: 'Press Start 2P', monospace;
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 20;
-    }
-
-    #instructionsPopup div {
-      background-color: #111;
+      overflow-y: auto;
       padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      max-width: 600px;
     }
 
-    #instructionsPopup h2 {
+    /* Container do tutorial */
+    .tutorial-container {
+      background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+      border: 3px solid #00ff00;
+      animation: slideIn 0.5s ease-out;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Animação de entrada do tutorial */
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Cabeçalho do tutorial */
+    .tutorial-header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .tutorial-header h1 {
       color: #00ff00;
+      font-size: 28px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #00ff00;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    /* Animação de brilho do título */
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00; }
+      50% { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00, 0 0 40px #00ff00; }
+    }
+
+    .tutorial-header p {
+      color: #aaa;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* Seções do tutorial */
+    .tutorial-section {
+      margin: 25px 0;
+      padding: 20px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      border-left: 4px solid #00ff00;
+    }
+
+    .tutorial-section h2 {
+      color: #00ffff;
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tutorial-section h2::before {
+      content: '▶';
+      color: #00ff00;
+      animation: blink 1.5s infinite;
+    }
+
+    /* Animação de piscar */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Grid de demonstração de controles */
+    .controls-demo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin: 15px 0;
+    }
+
+    /* Item individual de controle */
+    .control-item {
+      background: rgba(0, 255, 0, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid rgba(0, 255, 0, 0.3);
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .control-item:hover {
+      background: rgba(0, 255, 0, 0.2);
+      border-color: #00ff00;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+    }
+
+    .control-item .key {
+      font-size: 24px;
+      color: #00ff00;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .control-item .action {
+      font-size: 10px;
+      color: #aaa;
+      line-height: 1.4;
+    }
+
+    /* Showcase das peças do jogo */
+    .pieces-showcase {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    /* Demonstração individual de cada peça */
+    .piece-demo {
+      text-align: center;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* Delays diferentes para cada peça criar efeito de flutuação */
+    .piece-demo:nth-child(1) { animation-delay: 0s; }
+    .piece-demo:nth-child(2) { animation-delay: 0.2s; }
+    .piece-demo:nth-child(3) { animation-delay: 0.4s; }
+    .piece-demo:nth-child(4) { animation-delay: 0.6s; }
+    .piece-demo:nth-child(5) { animation-delay: 0.8s; }
+    .piece-demo:nth-child(6) { animation-delay: 1s; }
+    .piece-demo:nth-child(7) { animation-delay: 1.2s; }
+
+    /* Animação de flutuação */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .piece-demo canvas {
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .piece-demo:hover canvas {
+      border-color: #00ff00;
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+      transform: scale(1.1);
+    }
+
+    .piece-demo .piece-name {
+      font-size: 10px;
+      color: #00ffff;
+      margin-top: 8px;
+    }
+
+    /* Lista de dicas */
+    .tips-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .tips-list li {
+      padding: 10px;
+      margin: 8px 0;
+      background: rgba(255, 255, 0, 0.1);
+      border-left: 3px solid #ffff00;
+      border-radius: 5px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #ddd;
+      transition: all 0.3s ease;
+    }
+
+    .tips-list li:hover {
+      background: rgba(255, 255, 0, 0.2);
+      transform: translateX(5px);
+    }
+
+    .tips-list li::before {
+      content: '💡 ';
+      margin-right: 5px;
+    }
+
+    /* Botão de iniciar do tutorial */
+    .start-button {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 30px auto 0;
+      padding: 15px 30px;
+      font-size: 16px;
+      background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Press Start 2P', monospace;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* Animação de pulso do botão */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .start-button:hover {
+      background: linear-gradient(135deg, #00ff00 0%, #00ff00 100%);
+      box-shadow: 0 8px 25px rgba(0, 255, 0, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .start-button:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 10px rgba(0, 255, 0, 0.3);
+    }
+
+    /* Nota para dispositivos móveis */
+    .mobile-note {
+      background: rgba(255, 0, 255, 0.1);
+      border: 2px solid rgba(255, 0, 255, 0.3);
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0;
+      text-align: center;
+      font-size: 11px;
+      color: #ff00ff;
+      line-height: 1.6;
+    }
+
+    .mobile-note::before {
+      content: '📱 ';
+      font-size: 20px;
+      display: block;
       margin-bottom: 10px;
     }
 
-    #instructionsPopup button {
-      margin-top: 15px;
-      border-color: #00ff00;
-      color: #00ff00;
-      background-color: #222;
+    /* ============================================
+       🚀 EASTER EGG: INDICADOR DO MODO TURBO 🚀
+       ============================================
+       Este elemento exibe uma mensagem animada quando
+       o jogador ativa o modo turbo (3 toques rápidos no START)
+    */
+    #turboMode {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #ff0000 0%, #ff6600 100%);
+      color: #fff;
+      padding: 30px 50px;
+      border-radius: 20px;
+      font-size: 32px;
+      font-family: 'Press Start 2P', monospace;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
+      z-index: 100;
+      display: none; /* Oculto por padrão */
+      animation: turboAppear 0.5s ease-out;
     }
 
-    #instructionsPopup button:hover {
-      background-color: #00ff00;
-      color: #000;
+    /* Animação de aparição do indicador turbo */
+    @keyframes turboAppear {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Quando o modo turbo está ativo */
+    #turboMode.active {
+      display: block;
+      animation: turboAppear 0.5s ease-out, turboPulse 0.5s ease-in-out infinite 0.5s;
+    }
+
+    /* Animação de pulso do indicador turbo */
+    @keyframes turboPulse {
+      0%, 100% {
+        box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+      }
+      50% {
+        box-shadow: 0 0 60px rgba(255, 0, 0, 1), 0 0 90px rgba(255, 102, 0, 0.8);
+      }
+    }
+
+    /* Responsividade para dispositivos móveis */
+    @media (max-width: 768px) {
+      .tutorial-container {
+        padding: 20px;
+        margin: 10px;
+      }
+
+      .tutorial-header h1 {
+        font-size: 20px;
+      }
+
+      .tutorial-section h2 {
+        font-size: 14px;
+      }
+
+      .controls-demo {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .control-item .key {
+        font-size: 20px;
+      }
+
+      .pieces-showcase {
+        gap: 10px;
+      }
+
+      .start-button {
+        font-size: 14px;
+        padding: 12px 24px;
+      }
+
+      /* 🚀 EASTER EGG: Ajuste do indicador turbo para mobile */
+      #turboMode {
+        font-size: 20px;
+        padding: 20px 30px;
+      }
+    }
+
+    /* Estilização da barra de rolagem */
+    .tutorial-container::-webkit-scrollbar,
+    .dropdown-content::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .tutorial-container::-webkit-scrollbar-track,
+    .dropdown-content::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+
+    .tutorial-container::-webkit-scrollbar-thumb,
+    .dropdown-content::-webkit-scrollbar-thumb {
+      background: #00ff00;
+      border-radius: 10px;
+    }
+
+    .tutorial-container::-webkit-scrollbar-thumb:hover,
+    .dropdown-content::-webkit-scrollbar-thumb:hover {
+      background: #00cc00;
     }
   </style>
 </head>
 <body>
 
+  <!-- Container principal do jogo -->
   <div class="game-container">
+    <!-- Sidebar esquerda com informações do jogo -->
     <div class="sidebar">
       <div id="score">SCORE: <span>0</span></div>
       <div id="time">TIME: <span>0</span>s</div>
@@ -200,12 +568,15 @@
       <div id="combo">COMBO: <span>0</span></div>
     </div>
 
+    <!-- Canvas principal onde o jogo acontece -->
     <canvas id="tetris" width="300" height="600"></canvas>
 
+    <!-- Sidebar direita mostrando a próxima peça -->
     <div class="next-container">
       <canvas id="next" width="120" height="120"></canvas>
     </div>
 
+    <!-- Botões de controle do jogo -->
     <div class="controls">
       <button id="left">◀</button>
       <button id="right">▶</button>
@@ -217,88 +588,204 @@
     </div>
   </div>
 
+  <!-- Tela de Game Over -->
   <div id="gameOverScreen">
     <p>GAME OVER</p>
     <p>Pressione tecla E para reiniciar</p>
   </div>
 
-  <!-- POP-UP INSTRUÇÕES INTERATIVO -->
+  <!-- 🚀 EASTER EGG: Indicador visual do Modo Turbo
+       Este elemento aparece quando o jogador toca 3 vezes rápidas no botão START -->
+  <div id="turboMode">
+    🚀 MODO TURBO 🚀<br>
+    <span style="font-size: 16px; margin-top: 10px; display: block;">ATIVADO!</span>
+  </div>
+
+  <!-- Popup de instruções/tutorial -->
   <div id="instructionsPopup">
-    <div>
-      <h2>Como Jogar</h2>
-      <p>Objetivo: completar linhas para ganhar pontos!</p>
-      <p>Use as setas do teclado para mover as peças:</p>
-      <ul>
-        <li>◀ : Mover para esquerda</li>
-        <li>▶ : Mover para direita</li>
-        <li>▼ : Descer rápido</li>
-        <li>⟳ ou ▲ : Rotacionar peça</li>
-      </ul>
-      <p>Aqui estão algumas das peças que você vai encontrar:</p>
-      <div style="display:flex; justify-content:space-around; margin:10px 0;">
-        <canvas class="pieceCanvas" width="60" height="60" data-piece="H"></canvas>
-        <canvas class="pieceCanvas" width="60" height="60" data-piece="I"></canvas>
-        <canvas class="pieceCanvas" width="60" height="60" data-piece="J"></canvas>
-        <canvas class="pieceCanvas" width="60" height="60" data-piece="K"></canvas>
+    <div class="tutorial-container">
+      <div class="tutorial-header">
+        <h1>🎮 STACKBLOCKS 🎮</h1>
+        <p>Bem-vindo ao jogo de blocos mais viciante!</p>
       </div>
-      <button id="closeInstructions">Vamos jogar!</button>
+
+      <div class="tutorial-section">
+        <h2>🎯 Objetivo do Jogo</h2>
+        <p style="font-size: 11px; line-height: 1.6; color: #ccc;">
+          Complete linhas horizontais para eliminá-las e ganhar pontos! 
+          Quanto mais linhas você completar de uma vez, mais pontos você ganha. 
+          O jogo termina quando as peças atingem o topo da tela.
+        </p>
+      </div>
+
+      <div class="tutorial-section">
+        <h2>⌨️ Controles</h2>
+        <div class="controls-demo">
+          <div class="control-item">
+            <span class="key">◀</span>
+            <span class="action">Mover Esquerda</span>
+          </div>
+          <div class="control-item">
+            <span class="key">▶</span>
+            <span class="action">Mover Direita</span>
+          </div>
+          <div class="control-item">
+            <span class="key">▼</span>
+            <span class="action">Descer Rápido</span>
+          </div>
+          <div class="control-item">
+            <span class="key">⟳</span>
+            <span class="action">Rotacionar</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mobile-note">
+        <strong>JOGANDO NO CELULAR?</strong><br>
+        Use os botões na tela para controlar as peças!<br>
+        Toque nos botões ◀ ▶ ▼ ⟳ para mover e rotacionar.
+      </div>
+
+      <div class="tutorial-section">
+        <h2>🧩 Conheça as Peças</h2>
+        <p style="font-size: 10px; color: #aaa; margin-bottom: 15px;">
+          Passe o mouse sobre as peças para vê-las brilhar!
+        </p>
+        <div class="pieces-showcase">
+          <div class="piece-demo">
+            <canvas class="pieceCanvas" width="60" height="60" data-piece="I"></canvas>
+            <div class="piece-name">LINHA</div>
+          </div>
+          <div class="piece-demo">
+            <canvas class="pieceCanvas" width="60" height="60" data-piece="O"></canvas>
+            <div class="piece-name">QUADRADO</div>
+          </div>
+          <div class="piece-demo">
+            <canvas class="pieceCanvas" width="60" height="60" data-piece="T"></canvas>
+            <div class="piece-name">T</div>
+          </div>
+          <div class="piece-demo">
+            <canvas class="pieceCanvas" width="60" height="60" data-piece="L"></canvas>
+            <div class="piece-name">L</div>
+          </div>
+          <div class="piece-demo">
+            <canvas class="pieceCanvas" width="60" height="60" data-piece="J"></canvas>
+            <div class="piece-name">J</div>
+          </div>
+          <div class="piece-demo">
+            <canvas class="pieceCanvas" width="60" height="60" data-piece="S"></canvas>
+            <div class="piece-name">S</div>
+          </div>
+          <div class="piece-demo">
+            <canvas class="pieceCanvas" width="60" height="60" data-piece="Z"></canvas>
+            <div class="piece-name">Z</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tutorial-section">
+        <h2>💎 Dicas Pro</h2>
+        <ul class="tips-list">
+          <li>Deixe espaços para a peça LINHA (I) - ela elimina 4 linhas de uma vez!</li>
+          <li>Mantenha a superfície o mais plana possível para evitar buracos.</li>
+          <li>Use a rotação para encaixar peças em espaços apertados.</li>
+          <li>Fique de olho na próxima peça no painel lateral direito.</li>
+          <li>Combos consecutivos aumentam sua pontuação exponencialmente!</li>
+        </ul>
+      </div>
+
+      <button class="start-button" id="closeInstructions">
+        COMEÇAR A JOGAR! 🚀
+      </button>
     </div>
   </div>
 
-  <!-- Áudio para queda da peça -->
+  <!-- Elementos de áudio -->
   <audio id="pieceSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
-
-  <!-- MUSICA DE FUNDO -->
   <audio id="bgMusic" src="https://files.catbox.moe/3pgllj.mp3" preload="auto" loop></audio>
 
-  <!-- MENU DE AUDIO -->
-  <div class="audio-dropdown">
-    <button id="audioToggle">🎵 Trilha</button>
-    <div class="audio-dropdown-content" id="audioContent">
-      <p><strong>To Zanarkand</strong></p>
-      <button id="musicPlay">▶ Play</button>
-      <button id="musicPause">⏸ Pausar</button>
-      <label for="musicVolume">Volume:</label>
-      <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="0.5">
+  <!-- Menu dropdown de configurações -->
+  <div class="menu-dropdown">
+    <div style="position: relative;">
+      <button id="settingsToggle">⚙️ Configurações</button>
+      <div class="dropdown-content" id="settingsContent">
+        <p><strong>Música de Fundo: TO ZANARKAND</strong></p>
+        <button id="musicPlay">▶ Play</button>
+        <button id="musicPause">⏸ Pausar</button>
+        <label for="musicVolume">Volume:</label>
+        <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="0.5">
+      </div>
     </div>
   </div>
 
 <script>
-  // ==== CONFIGURAÇÃO INICIAL DO JOGO ====
+  // ========================================
+  // LÓGICA PRINCIPAL DO JOGO
+  // ========================================
+  
+  // Obtém referências aos elementos canvas e seus contextos 2D
   const canvas = document.getElementById('tetris');
   const ctx = canvas.getContext('2d');
   const nextCanvas = document.getElementById('next');
   const nextCtx = nextCanvas.getContext('2d');
 
+  // Obtém referências aos elementos HTML que exibem informações do jogo
   const scoreEl = document.querySelector('#score span');
   const timeEl = document.querySelector('#time span');
   const linesEl = document.querySelector('#lines span');
   const comboEl = document.querySelector('#combo span');
   const gameOverScreen = document.getElementById('gameOverScreen');
 
+  // Cria a arena do jogo (matriz 10x20 onde as peças caem)
   let arena = createMatrix(10, 20);
+  
+  // Variáveis de controle do tempo de queda das peças
   let dropCounter = 0;
-  let dropInterval = 1000;
+  let dropInterval = 1000; // Intervalo inicial de queda (1 segundo)
   let lastTime = 0;
   let startTime = 0;
+  
+  // Flags de estado do jogo
   let gameOver = false;
+  let turboMode = false; // 🚀 EASTER EGG: Flag que indica se o modo turbo está ativo
 
+  // Objeto que armazena o estado do jogador
   let player = {
-    pos: {x:0,y:0},
-    matrix: null,
-    score:0,
-    lines:0,
-    combo:0,
-    next: null
+    pos: {x:0, y:0},      // Posição atual da peça
+    matrix: null,          // Matriz da peça atual
+    score: 0,              // Pontuação
+    lines: 0,              // Linhas completadas
+    combo: 0,              // Combo atual
+    next: null             // Próxima peça
   };
 
-  // ==== PEÇAS ====
-  function createMatrix(w,h){
+  // ============================================
+  // 🚀 EASTER EGG: DETECÇÃO DE TOQUE TRIPLO 🚀
+  // ============================================
+  // Array que armazena os timestamps dos toques no botão START
+  let startButtonTaps = [];
+  // Janela de tempo para detectar os 3 toques (1 segundo)
+  const TRIPLE_TAP_WINDOW = 1000;
+  // Quantidade de toques necessários para ativar o easter egg
+  const TRIPLE_TAP_COUNT = 3;
+
+  /**
+   * Cria uma matriz vazia com as dimensões especificadas
+   * @param {number} w - Largura da matriz
+   * @param {number} h - Altura da matriz
+   * @returns {Array} Matriz preenchida com zeros
+   */
+  function createMatrix(w, h){
     const matrix = [];
     while(h--) matrix.push(new Array(w).fill(0));
     return matrix;
   }
 
+  /**
+   * Cria uma peça do Tetris baseada no tipo fornecido
+   * @param {string} type - Tipo da peça (T, O, L, J, I, S, Z)
+   * @returns {Array} Matriz representando a forma da peça
+   */
   function createPiece(type){
     switch(type){
       case 'T': return [[0,0,0],[1,1,1],[0,1,0]];
@@ -312,39 +799,89 @@
     }
   }
 
+  /**
+   * Desenha uma matriz (peça ou arena) no canvas
+   * @param {Array} matrix - Matriz a ser desenhada
+   * @param {Object} offset - Posição de offset {x, y}
+   * @param {CanvasRenderingContext2D} context - Contexto do canvas
+   */
   function drawMatrix(matrix, offset, context){
-    matrix.forEach((row,y)=>{
-      row.forEach((value,x)=>{
-        if(value!==0){
-          context.fillStyle = `hsl(${value*45},80%,60%)`;
-          context.fillRect((x+offset.x)*30, (y+offset.y)*30, 30, 30);
+    matrix.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if(value !== 0){
+          // Define a cor baseada no valor da célula usando HSL
+          context.fillStyle = `hsl(${value*45}, 80%, 60%)`;
+          context.fillRect((x + offset.x) * 30, (y + offset.y) * 30, 30, 30);
           context.strokeStyle = '#000';
-          context.strokeRect((x+offset.x)*30, (y+offset.y)*30, 30, 30);
+          context.strokeRect((x + offset.x) * 30, (y + offset.y) * 30, 30, 30);
         }
       });
     });
   }
 
+  /**
+   * Desenha a próxima peça no canvas de preview
+   */
+  function drawNextPiece(){
+    // Limpa o canvas
+    nextCtx.fillStyle = '#000';
+    nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+    
+    if(player.next){
+      const cellSize = 20;
+      // Centraliza a peça no canvas
+      const offsetX = (nextCanvas.width - player.next[0].length * cellSize) / 2;
+      const offsetY = (nextCanvas.height - player.next.length * cellSize) / 2;
+      
+      player.next.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if(value !== 0){
+            nextCtx.fillStyle = `hsl(${value*45}, 80%, 60%)`;
+            nextCtx.fillRect(offsetX + x*cellSize, offsetY + y*cellSize, cellSize, cellSize);
+            nextCtx.strokeStyle = '#000';
+            nextCtx.strokeRect(offsetX + x*cellSize, offsetY + y*cellSize, cellSize, cellSize);
+          }
+        });
+      });
+    }
+  }
+
+  /**
+   * Mescla a peça atual com a arena quando ela pousa
+   * @param {Array} arena - Matriz da arena
+   * @param {Object} player - Objeto do jogador
+   */
   function merge(arena, player){
-    player.matrix.forEach((row,y)=>{
-      row.forEach((value,x)=>{
-        if(value!==0) arena[y+player.pos.y][x+player.pos.x]=value;
+    player.matrix.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if(value !== 0) arena[y + player.pos.y][x + player.pos.x] = value;
       });
     });
   }
 
+  /**
+   * Verifica se há colisão entre a peça e a arena
+   * @param {Array} arena - Matriz da arena
+   * @param {Object} player - Objeto do jogador
+   * @returns {boolean} True se houver colisão
+   */
   function collide(arena, player){
-    const [m,o] = [player.matrix, player.pos];
-    for(let y=0;y<m.length;y++){
-      for(let x=0;x<m[y].length;x++){
-        if(m[y][x]!==0 && (arena[y+o.y] && arena[y+o.y][x+o.x])!==0) return true;
+    const [m, o] = [player.matrix, player.pos];
+    for(let y = 0; y < m.length; y++){
+      for(let x = 0; x < m[y].length; x++){
+        if(m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) 
+          return true;
       }
     }
     return false;
   }
 
+  /**
+   * Move a peça para baixo
+   */
   function playerDrop(){
     player.pos.y++;
+    // Se colidir, volta uma posição e mescla com a arena
     if(collide(arena, player)){
       player.pos.y--;
       merge(arena, player);
@@ -356,60 +893,87 @@
     dropCounter = 0;
   }
 
+  /**
+   * Move a peça horizontalmente
+   * @param {number} dir - Direção (-1 para esquerda, 1 para direita)
+   */
   function playerMove(dir){
     player.pos.x += dir;
+    // Se colidir, desfaz o movimento
     if(collide(arena, player)) player.pos.x -= dir;
   }
 
+  /**
+   * Reseta a peça do jogador com uma nova peça
+   */
   function playerReset(){
     const pieces = 'ILJOTSZ';
-    player.matrix = player.next || createPiece(pieces[pieces.length*Math.random()|0]);
-    player.next = createPiece(pieces[pieces.length*Math.random()|0]);
+    // Define a peça atual como a próxima, ou cria uma aleatória
+    player.matrix = player.next || createPiece(pieces[pieces.length * Math.random() | 0]);
+    // Gera a próxima peça
+    player.next = createPiece(pieces[pieces.length * Math.random() | 0]);
     player.pos.y = 0;
-    player.pos.x = (arena[0].length/2|0)-(player.matrix[0].length/2|0);
+    // Centraliza a peça horizontalmente
+    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+    
+    // Verifica se há colisão no spawn (Game Over)
     if(collide(arena, player)){
-      arena.forEach(row=>row.fill(0));
-      player.score = 0;
-      player.lines = 0;
-      player.combo = 0;
-      gameOverScreen.style.display='flex';
-      gameOver=true;
+      arena.forEach(row => row.fill(0));
+      gameOverScreen.style.display = 'flex';
+      gameOver = true;
     }
   }
 
+  /**
+   * Rotaciona uma matriz 90 graus
+   * @param {Array} matrix - Matriz a ser rotacionada
+   * @param {number} dir - Direção da rotação (1 ou -1)
+   */
   function rotate(matrix, dir){
-    for(let y=0;y<matrix.length;y++){
-      for(let x=0;x<y;x++){
-        [matrix[x][y],matrix[y][x]]=[matrix[y][x],matrix[x][y]];
+    // Transpõe a matriz
+    for(let y = 0; y < matrix.length; y++){
+      for(let x = 0; x < y; x++){
+        [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
       }
     }
-    if(dir>0) matrix.forEach(row=>row.reverse());
+    // Inverte as linhas ou colunas dependendo da direção
+    if(dir > 0) matrix.forEach(row => row.reverse());
     else matrix.reverse();
   }
 
+  /**
+   * Rotaciona a peça do jogador com wall kick
+   */
   function playerRotate(dir){
     rotate(player.matrix, dir);
     let offset = 1;
+    // Tenta ajustar a posição se houver colisão após rotação
     while(collide(arena, player)){
       player.pos.x += offset;
-      offset = -(offset+(offset>0?1:-1));
-      if(offset>player.matrix[0].length){
+      offset = -(offset + (offset > 0 ? 1 : -1));
+      if(offset > player.matrix[0].length){
         rotate(player.matrix, -dir);
-        player.pos.x=0;
+        player.pos.x = 0;
         return;
       }
     }
   }
 
+  /**
+   * Verifica e remove linhas completas
+   */
   function sweep(){
     let rowCount = 1;
-    outer: for(let y=arena.length-1;y>=0;y--){
-      for(let x=0;x<arena[y].length;x++){
-        if(arena[y][x]===0) continue outer;
+    outer: for(let y = arena.length - 1; y >= 0; y--){
+      // Verifica se a linha está completa
+      for(let x = 0; x < arena[y].length; x++){
+        if(arena[y][x] === 0) continue outer;
       }
-      const row = arena.splice(y,1)[0].fill(0);
+      // Remove a linha e adiciona uma nova no topo
+      const row = arena.splice(y, 1)[0].fill(0);
       arena.unshift(row);
-      player.score += rowCount*10;
+      // Aumenta a pontuação
+      player.score += rowCount * 10;
       player.lines++;
       player.combo++;
       rowCount *= 2;
@@ -417,115 +981,237 @@
     }
   }
 
+  /**
+   * Atualiza a exibição da pontuação na tela
+   */
   function updateScore(){
     scoreEl.innerText = player.score;
     linesEl.innerText = player.lines;
     comboEl.innerText = player.combo;
   }
 
-  function update(time=0){
+  /**
+   * Loop principal do jogo
+   * @param {number} time - Timestamp atual
+   */
+  function update(time = 0){
     const deltaTime = time - lastTime;
     lastTime = time;
     dropCounter += deltaTime;
-    if(dropCounter>dropInterval && !gameOver) playerDrop();
+    
+    // Se o contador atingir o intervalo, desce a peça
+    if(dropCounter > dropInterval && !gameOver) playerDrop();
+    
+    // Limpa o canvas
     ctx.fillStyle = '#000';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    drawMatrix(arena,{x:0,y:0},ctx);
-    drawMatrix(player.matrix,player.pos,ctx);
-
-    // ======= CORREÇÃO DO BUG DA PRÓXIMA PEÇA =======
-    nextCtx.fillStyle = '#000';
-    nextCtx.fillRect(0,0,nextCanvas.width,nextCanvas.height);
-    if (player.next) {
-      const blockSize = 20;
-      const offsetX = Math.floor((nextCanvas.width - player.next[0].length * blockSize) / 2 / blockSize);
-      const offsetY = Math.floor((nextCanvas.height - player.next.length * blockSize) / 2 / blockSize);
-      player.next.forEach((row, y) => {
-        row.forEach((value, x) => {
-          if (value !== 0) {
-            nextCtx.fillStyle = `hsl(${value * 45},80%,60%)`;
-            nextCtx.fillRect((x + offsetX) * blockSize, (y + offsetY) * blockSize, blockSize, blockSize);
-            nextCtx.strokeStyle = '#000';
-            nextCtx.strokeRect((x + offsetX) * blockSize, (y + offsetY) * blockSize, blockSize, blockSize);
-          }
-        });
-      });
-    }
-    // ===============================================
-
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Desenha a arena e a peça atual
+    drawMatrix(arena, {x:0, y:0}, ctx);
+    drawMatrix(player.matrix, player.pos, ctx);
+    drawNextPiece();
+    
+    // Continua o loop
     requestAnimationFrame(update);
   }
 
-  document.addEventListener('keydown', event=>{
-    if(gameOver && event.key==='e'){ // Reiniciar
-      gameOverScreen.style.display='none';
-      gameOver=false;
+  // ============================================
+  // 🚀 EASTER EGG: FUNÇÃO DE ATIVAÇÃO DO MODO TURBO 🚀
+  // ============================================
+  /**
+   * Ativa o modo turbo, acelerando a queda das peças
+   * Esta função é chamada quando o jogador toca 3 vezes rápidas no botão START
+   */
+  function activateTurboMode(){
+    turboMode = true;
+    // Reduz o intervalo de queda para 300ms (velocidade 3x mais rápida)
+    dropInterval = 300;
+    
+    // Exibe o indicador visual do modo turbo
+    const turboIndicator = document.getElementById('turboMode');
+    turboIndicator.classList.add('active');
+    
+    // Remove o indicador após 2 segundos
+    setTimeout(() => {
+      turboIndicator.classList.remove('active');
+    }, 2000);
+  }
+
+  // ============================================
+  // 🚀 EASTER EGG: FUNÇÃO DE DETECÇÃO DE TOQUE TRIPLO 🚀
+  // ============================================
+  /**
+   * Verifica se o jogador tocou 3 vezes rápidas no botão START
+   * @returns {boolean} True se o modo turbo foi ativado
+   */
+  function checkTripleTap(){
+    const now = Date.now();
+    
+    // Adiciona o timestamp do toque atual ao array
+    startButtonTaps.push(now);
+    
+    // Remove toques que estão fora da janela de tempo (1 segundo)
+    startButtonTaps = startButtonTaps.filter(tapTime => now - tapTime < TRIPLE_TAP_WINDOW);
+    
+    // Verifica se há 3 ou mais toques dentro da janela de tempo
+    if(startButtonTaps.length >= TRIPLE_TAP_COUNT){
+      activateTurboMode(); // Ativa o modo turbo
+      startButtonTaps = []; // Reseta o array de toques
+      return true;
+    }
+    
+    return false;
+  }
+
+  // ========================================
+  // EVENT LISTENERS - CONTROLES DO TECLADO
+  // ========================================
+  document.addEventListener('keydown', event => {
+    // Reinicia o jogo se estiver em Game Over e pressionar 'E'
+    if(gameOver && event.key === 'e'){
+      gameOverScreen.style.display = 'none';
+      gameOver = false;
+      player.score = 0;
+      player.lines = 0;
+      player.combo = 0;
+      turboMode = false; // 🚀 EASTER EGG: Reseta o modo turbo
+      dropInterval = 1000; // 🚀 EASTER EGG: Restaura velocidade normal
       playerReset();
       updateScore();
       return;
     }
-    if(event.key==='ArrowLeft') playerMove(-1);
-    if(event.key==='ArrowRight') playerMove(1);
-    if(event.key==='ArrowDown') playerDrop();
-    if(event.key==='ArrowUp') playerRotate(1);
-    if(event.key===' ') playerRotate(1);
+    
+    // Controles do jogo
+    if(event.key === 'ArrowLeft') playerMove(-1);
+    if(event.key === 'ArrowRight') playerMove(1);
+    if(event.key === 'ArrowDown') playerDrop();
+    if(event.key === 'ArrowUp') playerRotate(1);
+    if(event.key === ' ') playerRotate(1);
   });
 
-  document.getElementById('left').addEventListener('click',()=>playerMove(-1));
-  document.getElementById('right').addEventListener('click',()=>playerMove(1));
-  document.getElementById('down').addEventListener('click',()=>playerDrop());
-  document.getElementById('rotate').addEventListener('click',()=>playerRotate(1));
-  document.getElementById('start').addEventListener('click',()=>{playerReset(); update();});
-  document.getElementById('restart').addEventListener('click',()=>{arena.forEach(row=>row.fill(0)); playerReset(); updateScore(); gameOverScreen.style.display='none'; gameOver=false;});
-  document.getElementById('pause').addEventListener('click',()=>gameOver=!gameOver);
+  // ========================================
+  // EVENT LISTENERS - BOTÕES NA TELA
+  // ========================================
+  
+  // Botões de movimento
+  document.getElementById('left').addEventListener('click', () => playerMove(-1));
+  document.getElementById('right').addEventListener('click', () => playerMove(1));
+  document.getElementById('down').addEventListener('click', () => playerDrop());
+  document.getElementById('rotate').addEventListener('click', () => playerRotate(1));
+  
+  // 🚀 EASTER EGG: Botão START com detecção de toque triplo
+  document.getElementById('start').addEventListener('click', () => {
+    // Verifica se o jogador tocou 3 vezes rápidas (Easter Egg)
+    checkTripleTap();
+    
+    // Inicia o jogo normalmente
+    playerReset(); 
+    update();
+  });
+  
+  // Botão de reiniciar
+  document.getElementById('restart').addEventListener('click', () => {
+    arena.forEach(row => row.fill(0)); 
+    player.score = 0;
+    player.lines = 0;
+    player.combo = 0;
+    turboMode = false; // 🚀 EASTER EGG: Reseta o modo turbo
+    dropInterval = 1000; // 🚀 EASTER EGG: Restaura velocidade normal
+    startButtonTaps = []; // 🚀 EASTER EGG: Limpa o array de toques
+    playerReset(); 
+    updateScore(); 
+    gameOverScreen.style.display = 'none'; 
+    gameOver = false;
+  });
+  
+  // Botão de pausar
+  document.getElementById('pause').addEventListener('click', () => gameOver = !gameOver);
 
-  // ==== POP-UP INTERATIVO ====
+  // ========================================
+  // RENDERIZAÇÃO DAS PEÇAS NO TUTORIAL
+  // ========================================
+  
   const instructionsCanvasList = document.querySelectorAll('.pieceCanvas');
   const piecesData = {
-    'H': [[0,8,8],[8,8,0]],
-    'I': [[0,9,0],[9,9,9]],
-    'J': [[10,0,0],[10,10,10]],
-    'K': [[0,0,11],[11,11,11]],
+    'I': [[0,5,0,0],[0,5,0,0],[0,5,0,0],[0,5,0,0]],
+    'O': [[2,2],[2,2]],
+    'T': [[0,0,0],[1,1,1],[0,1,0]],
+    'L': [[0,3,0],[0,3,0],[0,3,3]],
+    'J': [[0,4,0],[0,4,0],[4,4,0]],
+    'S': [[0,6,6],[6,6,0],[0,0,0]],
+    'Z': [[7,7,0],[0,7,7],[0,0,0]],
   };
 
-  instructionsCanvasList.forEach(canvas=>{
+  // Desenha cada peça no tutorial
+  instructionsCanvasList.forEach(canvas => {
     const ctx = canvas.getContext('2d');
     const pieceKey = canvas.getAttribute('data-piece');
     const matrix = piecesData[pieceKey];
+    
+    // Preenche o fundo
     ctx.fillStyle = '#000';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    matrix.forEach((row,y)=>{
-      row.forEach((val,x)=>{
-        if(val!==0){
-          ctx.fillStyle=`hsl(${val*45},80%,60%)`;
-          ctx.fillRect(x*20, y*20, 20, 20);
-          ctx.strokeStyle="#000";
-          ctx.strokeRect(x*20, y*20, 20, 20);
+    const cellSize = 15;
+    // Centraliza a peça
+    const offsetX = (canvas.width - matrix[0].length * cellSize) / 2;
+    const offsetY = (canvas.height - matrix.length * cellSize) / 2;
+
+    // Desenha a peça
+    matrix.forEach((row, y) => {
+      row.forEach((val, x) => {
+        if(val !== 0){
+          ctx.fillStyle = `hsl(${val*45}, 80%, 60%)`;
+          ctx.fillRect(offsetX + x*cellSize, offsetY + y*cellSize, cellSize, cellSize);
+          ctx.strokeStyle = "#000";
+          ctx.strokeRect(offsetX + x*cellSize, offsetY + y*cellSize, cellSize, cellSize);
         }
       });
     });
   });
 
-  document.getElementById('closeInstructions').addEventListener('click',()=>{
-    document.getElementById('instructionsPopup').style.display='none';
+  // Fecha o popup de instruções e inicia o jogo
+  document.getElementById('closeInstructions').addEventListener('click', () => {
+    document.getElementById('instructionsPopup').style.display = 'none';
     playerReset();
     update();
   });
 
-  // ==== ÁUDIO ====
+  // ========================================
+  // MENU DROPDOWN DE CONFIGURAÇÕES
+  // ========================================
+  
+  const settingsToggle = document.getElementById('settingsToggle');
+  const settingsContent = document.getElementById('settingsContent');
+
+  // Alterna a visibilidade do menu
+  settingsToggle.addEventListener('click', () => {
+    const isVisible = settingsContent.style.display === 'block';
+    settingsContent.style.display = isVisible ? 'none' : 'block';
+  });
+
+  // Fecha o menu ao clicar fora dele
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.menu-dropdown')) {
+      settingsContent.style.display = 'none';
+    }
+  });
+
+  // ========================================
+  // CONTROLES DE MÚSICA
+  // ========================================
+  
   const bgMusic = document.getElementById('bgMusic');
   const musicPlay = document.getElementById('musicPlay');
   const musicPause = document.getElementById('musicPause');
   const musicVolume = document.getElementById('musicVolume');
 
-  musicPlay.addEventListener('click',()=>bgMusic.play());
-  musicPause.addEventListener('click',()=>bgMusic.pause());
-  musicVolume.addEventListener('input',(e)=>bgMusic.volume=e.target.value);
-
-  const audioToggle = document.getElementById('audioToggle');
-  const audioContent = document.getElementById('audioContent');
-  audioToggle.addEventListener('click',()=>audioContent.style.display=audioContent.style.display==='block'?'none':'block');
+  // Controles de reprodução
+  musicPlay.addEventListener('click', () => bgMusic.play());
+  musicPause.addEventListener('click', () => bgMusic.pause());
+  musicVolume.addEventListener('input', (e) => bgMusic.volume = e.target.value);
 </script>
 </body>
 </html>
+
+
